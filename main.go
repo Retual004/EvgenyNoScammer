@@ -25,8 +25,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request){
 		http.Error(w, "Неверный json", http.StatusBadRequest)
 		return 
 	}
-	
-	task = requestBody.Message //записываем то что передали в глобальную переменную
+
+	task = requestBody.Message //записываем то что передали в глобальную переменную 
 	fmt.Fprintf(w, "json успешно записан")
 }
 
