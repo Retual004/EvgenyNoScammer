@@ -6,15 +6,17 @@ import (
 	"github.com/gorilla/mux"
 	"encoding/json"
 )
-
 var task string
 
 type requestBody struct {
-Message string `json:"message"`
+Task string `json:"task"`
+IsDone bool   `json:"is_done"`
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request){
-	fmt.Fprintln(w,"Hello", task)
+	var tasks []Task
+	 DB.Find(&tasks)
+	json.NewEncoder(w).Encode(tasks)
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request){
@@ -25,17 +27,24 @@ func PostHandler(w http.ResponseWriter, r *http.Request){
 		http.Error(w, "Неверный json", http.StatusBadRequest)
 		return 
 	}
-
-	task = requestBody.Message //записываем то что передали в глобальную переменную 
+	task := Task{
+		Task: requestBody.Task, 
+		IsDone: requestBody.IsDone,
+	}
+	result:= DB.Create(&task)
+	if result.Error != nil{
+		http.Error(w, "Ошибка при сохранении в БД", http.StatusInternalServerError)
+        return
+	}
 	fmt.Fprintf(w, "json успешно записан")
 }
 
 func main(){
+InitDB()
+DB.AutoMigrate(&Task{})
 router := mux.NewRouter() 
-
 router.HandleFunc("/post", PostHandler).Methods("POST")
 router.HandleFunc("/get", GetHandler).Methods("GET")
-
 http.ListenAndServe(":8080", router)
 
 }
