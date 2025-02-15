@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var task string
 
 type requestBody struct {
 	Task   string `json:"task"`
@@ -65,7 +64,7 @@ if result.Error != nil{
 }
 // обновляем только те понял, которые были переданы
 updatedData := Task{}
-if updatedData.Task != ""{
+if requestBody.Task != ""{
 	updatedData.Task = requestBody.Task
 }
 if requestBody.IsDone{
