@@ -64,10 +64,10 @@ if result.Error != nil{
 }
 // обновляем только те понял, которые были переданы
 updatedData := Task{}
-if requestBody.Task != ""{
+if requestBody.Task != "" {
 	updatedData.Task = requestBody.Task
 }
-if requestBody.IsDone{
+if requestBody.IsDone != task.IsDone { // проверка, чтобы не обновлять без изменений
 	updatedData.IsDone = requestBody.IsDone
 }
 //обновнялем задачу в базе данных 
@@ -75,7 +75,7 @@ result = DB.Model(&task).Updates(updatedData)
 if result.Error != nil{
 	http.Error(w, "Ошибка при обновлении задачи", http.StatusInternalServerError)
 }
-fmt.Fprintf(w, "Задача обновлена")
+	json.NewEncoder(w).Encode(task)
 }
 
 
