@@ -23,8 +23,8 @@ func main() {
 	e := echo.New() 
 
 	// используем Logger и Recover 
-	e.Use(middleware.Logger())// что это ?
-	e.Use(middleware.Recover())
+	e.Use(middleware.Logger())// логирует все 
+	e.Use(middleware.Recover()) // перехватывает ошибку 
 
 	strictHandler := tasks.NewStrictHandler(handler, nil) 
 	tasks.RegisterHandlers(e, strictHandler)
