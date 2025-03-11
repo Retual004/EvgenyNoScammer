@@ -1,42 +1,49 @@
+// main.go
 package main
 
 import (
 	"NewProjectGo/internal/database"
 	"NewProjectGo/internal/handlers"
 	"NewProjectGo/internal/taskService"
+	"NewProjectGo/internal/userService"
 	"NewProjectGo/internal/web/tasks"
-	"log"
+	"NewProjectGo/internal/web/users"
 	"github.com/labstack/echo/v4"
-  	"github.com/labstack/echo/v4/middleware"
-	
+	"github.com/labstack/echo/v4/middleware"
+	"log"
 )
 
 func main() {
+	// Инициализация базы данных
 	database.InitDB()
 
-	repo := taskService.NewTaskRepository(database.DB)
-	service := taskService.NewService(repo)
+	// Репозиторий и сервис для задач
+	taskRepo := taskService.NewTaskRepository(database.DB)
+	taskService := taskService.NewTaskService(taskRepo)
+	taskHandler := handlers.NewTaskHandler(taskService)
 
-	handler := handlers.NewHandler(service)
+	// Репозиторий и сервис для пользователей
+	userRepo := userService.NewUserRepository(database.DB)
+	userService := userService.NewUserService(userRepo)
+	userHandler := handlers.NewUserHandler(userService)
 
-	// инициализируем echo
-	e := echo.New() 
+	// Инициализация echo
+	e := echo.New()
 
-	// используем Logger и Recover 
-	e.Use(middleware.Logger())// логирует все 
-	e.Use(middleware.Recover()) // перехватывает ошибку 
+	// Используем логгер и recover middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-	strictHandler := tasks.NewStrictHandler(handler, nil) 
-	tasks.RegisterHandlers(e, strictHandler)
+	// Регистрация маршрутов для задач
+	strictTaskHandler := tasks.NewStrictHandler(taskHandler, nil)
+	tasks.RegisterHandlers(e, strictTaskHandler)
 
+	// Регистрация маршрутов для пользователей
+	strictUserHandler := users.NewStrictHandler(userHandler, nil)
+	users.RegisterHandlers(e, strictUserHandler)
+
+	// Стартуем сервер
 	if err := e.Start(":8080"); err != nil {
 		log.Fatalf("failed to start with err: %v", err)
 	}
-
-	// router := mux.NewRouter()
-	// router.HandleFunc("/api/get", handler.GetTaskHandler).Methods("GET")
-	// router.HandleFunc("/api/post", handler.PostTaskHandler).Methods("POST")
-	// router.HandleFunc("/api/patch/{id}", handler.PatchTaskHandler).Methods("PATCH")
-	// router.HandleFunc("/api/delete/{id}", handler.DeleteTaskHandler).Methods("DELETE")
-	// http.ListenAndServe(":8080", router)
 }

@@ -1,6 +1,6 @@
 module NewProjectGo
 
-go 1.23.5
+go 1.24.1
 
 require (
 	github.com/oapi-codegen/runtime v1.1.1

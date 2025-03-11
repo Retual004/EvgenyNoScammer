@@ -10,12 +10,13 @@ type Handler struct {
 	Service *taskService.TaskService
 }
 
-func NewHandler(service *taskService.TaskService) *Handler {
+
+
+func NewTaskHandler(service *taskService.TaskService) *Handler {
 	return &Handler{
 		Service: service,
 	}
 }
-
 
 func (h *Handler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject) (tasks.GetTasksResponseObject, error) {
 	// Получение всех задач из сервиса
@@ -66,8 +67,8 @@ func (h *Handler) PostTasks(_ context.Context, request tasks.PostTasksRequestObj
 }
 
 // PatchTask implements tasks.StrictServerInterface.
-func (h *Handler) PatchTasksId(ctx context.Context, request tasks.PatchTasksIdRequestObject) (tasks.PatchTasksIdResponseObject, error) {
-	id := request.Id
+func (h *Handler) PatchTasksTaskId(ctx context.Context, request tasks.PatchTasksTaskIdRequestObject) (tasks.PatchTasksTaskIdResponseObject, error) {
+	id := request.TaskId
 	taskRequest := request.Body
 
 	// Обновляем задачу через сервис
@@ -77,12 +78,12 @@ func (h *Handler) PatchTasksId(ctx context.Context, request tasks.PatchTasksIdRe
 	})
 	if err != nil {
 		// Если ошибка при обновлении задачи, возвращаем ошибку
-		return   nil , err 
+		return nil, err
 	}
 
 	// Возвращаем обновленную задачу в ответе
 	// Здесь используем правильный тип ответа
-	response := tasks.PatchTasksId200JSONResponse{
+	response := tasks.PatchTasksTaskId200JSONResponse{
 		Id:     &updatedTask.ID,
 		Task:   &updatedTask.Task,
 		IsDone: &updatedTask.IsDone,
@@ -93,8 +94,8 @@ func (h *Handler) PatchTasksId(ctx context.Context, request tasks.PatchTasksIdRe
 }
 
 // DeleteTask implements tasks.StrictServerInterface.
-func (h *Handler) DeleteTasksId(ctx context.Context, request tasks.DeleteTasksIdRequestObject) (tasks.DeleteTasksIdResponseObject, error) {
-	id := request.Id
+func (h *Handler) DeleteTasksTaskId(ctx context.Context, request tasks.DeleteTasksTaskIdRequestObject) (tasks.DeleteTasksTaskIdResponseObject, error) {
+	id := request.TaskId
 
 	// Удаляем задачу через сервис
 	err := h.Service.DeleteTaskByID(id)
@@ -104,55 +105,5 @@ func (h *Handler) DeleteTasksId(ctx context.Context, request tasks.DeleteTasksId
 	}
 
 	// Возвращаем пустой ответ, так как задача успешно удалена
-	return tasks.DeleteTasksId204Response{}, nil
+	return tasks.DeleteTasksTaskId204Response{}, nil
 }
-
-//Нужна для создания структуры Handler на этапе инициализации приложения
-
-
-// func (h *Handler) PatchTaskHandler(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	idStr := vars["id"]
-// 	id, err := strconv.ParseUint(idStr, 10, 32)
-// 	if err != nil {
-// 		http.Error(w, "Invailed ID", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	// Декодируем данные для обновления
-// 	var requestBody taskService.Task
-// 	err = json.NewDecoder(r.Body).Decode(&requestBody)
-// 	if err != nil {
-// 		http.Error(w, "Invailed JSON", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	updateTask, err := h.Service.UpdateTaskByID(uint(id), requestBody)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(updateTask)
-// }
-
-// func (h *Handler) DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
-
-// 	vars := mux.Vars(r)
-// 	idStr := vars["id"]
-// 	id, err := strconv.ParseUint(idStr, 10, 32)
-// 	if err != nil {
-// 		http.Error(w, "Invailed ID", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	err = h.Service.DeleteTaskByID(uint(id))
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Возвращаем статус 204 (No Content), так как тело ответа не нужно
-// 	w.WriteHeader(http.StatusNoContent)
-// }

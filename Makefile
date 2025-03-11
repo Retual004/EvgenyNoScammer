@@ -15,19 +15,28 @@ migrate:
 # Откат миграций
 migrate-down:
 	$(MIGRATE) down
-	
+
+# Применение миграции для пользователей
+migrate-users:
+	$(MIGRATE) up 20250310144132_create_user.up
+
 # для удобства добавим команду run, которая будет запускать наше приложение
 run:
 	go run cmd/app/main.go 
-# Теперь при вызове make run мы запустим наш сервер
 
-gen:
-	oapi-codegen -config openapi/.openapi -include-tags tasks -package tasks openapi/openapi.yaml > ./internal/web/tasks/api.gen.go
+generate:
+	@echo "Генерация кода из спецификации OpenAPI..."
+	oapi-codegen -config openapi/.openapi.tasks -include-tags tasks openapi/openapi.yaml > ./internal/web/tasks/api.gen.go
+	oapi-codegen -config openapi/.openapi.users -include-tags users openapi/openapi.yaml > ./internal/web/users/api.gen.go
+
 
 git:
 	git add .
 	git commit -m "$(commit)"
 	git push
+
+lint:
+	golangci-lint run --out-format=colored-line-number
 
 # oapi-codegen - обращается к нашей утилите oapi
 # -config openapi/.openapi - за конфиг берем файл .openapi из папки openapi
