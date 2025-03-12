@@ -16,10 +16,6 @@ migrate:
 migrate-down:
 	$(MIGRATE) down
 
-# Применение миграции для пользователей
-migrate-users:
-	$(MIGRATE) up 20250310144132_create_user.up
-
 # для удобства добавим команду run, которая будет запускать наше приложение
 run:
 	go run cmd/app/main.go 

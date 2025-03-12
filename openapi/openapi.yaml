@@ -92,6 +92,32 @@ paths:
         '500':
           description: Internal server error
 
+  /tasks/user/{user_id}:
+    get:
+      summary: Get all tasks for a specific user
+      tags:
+        - tasks
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        '200':
+          description: A list of tasks for the specified user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+
   /users:
     get:
       summary: Get all users
@@ -180,6 +206,11 @@ components:
           type: string
         is_done:
           type: boolean
+        user_id:
+          type: integer
+          format: uint
+          description: The ID of the user who owns the task
+
     User:
       type: object
       properties:

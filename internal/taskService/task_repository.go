@@ -1,6 +1,9 @@
 package taskService
 
- import "gorm.io/gorm"
+ import (
+	"gorm.io/gorm"
+	"fmt"
+)
 
 type TaskRepository interface {
 	// CreateTask - передаем в функцию task типа Task из orm.go
@@ -13,6 +16,8 @@ type TaskRepository interface {
 	UpdateTaskByID(id uint, task Task) (Task, error)
 	// DeleteTaskByID - передаем id для управления, возвращаем только ошибку
 	DeleteTaskByID(id uint) error
+	// 
+	GetTasksUserUserId(id uint) ([]Task, error)
 }
 
 type taskRepository struct {
@@ -24,6 +29,10 @@ func NewTaskRepository(db *gorm.DB) *taskRepository{
 }
 
 func (r *taskRepository) CreateTask(task Task) (Task, error){
+	if task.UserID == 0 {
+		return Task{}, fmt.Errorf("user_id cannot be zero")
+	}
+
 	result := r.db.Create(&task)
 	if result.Error != nil{
 		return Task{}, result.Error
@@ -69,4 +78,13 @@ if result.Error != nil {
 	return result.Error
 }
 return nil
+}
+
+func (r *taskRepository) GetTasksUserUserId(userID uint) ([]Task, error) {
+	var tasks []Task
+	// Предполагаем, что у задачи есть поле UserID, которое связывает задачу с пользователем
+	if err := r.db.Where("user_id = ?", userID).Find(&tasks).Error; err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }

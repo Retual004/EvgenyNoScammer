@@ -35,6 +35,7 @@ func (h *Handler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject) (ta
 			Id:     &tsk.ID,
 			Task:   &tsk.Task,
 			IsDone: &tsk.IsDone,
+			UserId: &tsk.UserID,
 		}
 		response = append(response, task)
 	}
@@ -50,6 +51,7 @@ func (h *Handler) PostTasks(_ context.Context, request tasks.PostTasksRequestObj
 	taskToCreate := taskService.Task{
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
+		UserID: *taskRequest.UserId,
 	}
 	createdTask, err := h.Service.CreateTask(taskToCreate)
 
@@ -61,6 +63,7 @@ func (h *Handler) PostTasks(_ context.Context, request tasks.PostTasksRequestObj
 		Id:     &createdTask.ID,
 		Task:   &createdTask.Task,
 		IsDone: &createdTask.IsDone,
+		UserId: &createdTask.UserID,
 	}
 	// Просто возвращаем респонс!
 	return response, nil
@@ -106,4 +109,22 @@ func (h *Handler) DeleteTasksTaskId(ctx context.Context, request tasks.DeleteTas
 
 	// Возвращаем пустой ответ, так как задача успешно удалена
 	return tasks.DeleteTasksTaskId204Response{}, nil
+}
+
+func (h *Handler) GetTasksUserUserId(ctx context.Context, request tasks.GetTasksUserUserIdRequestObject) (tasks.GetTasksUserUserIdResponseObject, error) {
+    task, err := h.Service.GetTasksByUserID(request.UserId)
+    if err != nil {
+        return nil, err
+    }
+
+    var response tasks.GetTasksUserUserId200JSONResponse
+    for _, task := range task {
+        response = append(response, tasks.Task{
+            Id:     &task.ID,
+            Task:   &task.Task,
+            IsDone: &task.IsDone,
+            UserId: &task.UserID,
+        })
+    }
+    return response, nil
 }
