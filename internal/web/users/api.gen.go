@@ -126,10 +126,10 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.GET(baseURL+"/get_users", wrapper.GetUsers)
-	router.POST(baseURL+"/post_users", wrapper.PostUsers)
-	router.DELETE(baseURL+"/delete_users/:user_id", wrapper.DeleteUsersUserId)
-	router.PATCH(baseURL+"/patch_users/:user_id", wrapper.PatchUsersUserId)
+	router.GET(baseURL+"/api/users", wrapper.GetUsers)
+	router.POST(baseURL+"/api/users", wrapper.PostUsers)
+	router.DELETE(baseURL+"/api/users/:user_id", wrapper.DeleteUsersUserId)
+	router.PATCH(baseURL+"/api/users/:user_id", wrapper.PatchUsersUserId)
 
 }
 
