@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/empty.proto";
+option go_package = "github.com/Retual004/EvgenyNoScammer/project-protos/proto/user";
+
+// Сущность пользователь
+message User {
+  uint32 id       = 1;
+  string email    = 2;
+  string password = 3;
+}
+
+// Create
+message CreateUserRequest {
+  string email    = 1;
+  string password = 2;
+}
+message CreateUserResponse {
+  User user = 1;
+}
+
+// Update
+message UpdateUserRequest {
+  User user = 1;
+}
+message UpdateUserResponse {
+  User user = 1;
+}
+
+// Delete
+message DeleteUserRequest {
+  uint32 id = 1;
+}
+
+service UserService {
+  rpc CreateUser (CreateUserRequest)   returns (CreateUserResponse);
+  rpc GetUser    (User)                returns (User);
+  rpc UpdateUser (UpdateUserRequest)   returns (UpdateUserResponse);
+  rpc DeleteUser (DeleteUserRequest)   returns (google.protobuf.Empty);
+}

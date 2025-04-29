@@ -4,6 +4,7 @@
 DB_DSN := "postgres://postgres:77788999@localhost:5432/postgres?sslmode=disable"
 MIGRATE := migrate -path ./migrations -database $(DB_DSN)
 
+
 # Таргет для создания новой миграции
 migrate-new:
 	migrate create -ext sql -dir ./migrations ${NAME}
@@ -40,3 +41,22 @@ lint:
 # -package tasks openapi/openapi.yaml > ./internal/web/tasks/api.gen.go 
 # генерируем все описанное по пути interanl/web/tasks. Этот путь вам нужно создать
 # Создать в папке internal папку web и в ней папку tasks
+
+
+# путь к исходникам .proto
+PROTOS := project-protos/proto/*.proto
+
+# куда класть сгенерённые .pb.go
+OUT_DIR := proto
+
+.PHONY: generate-proto clean
+
+generate-proto:
+	mkdir -p $(OUT_DIR)
+	protoc -I project-protos/proto \
+	  --go_out=$(OUT_DIR) --go_opt=paths=source_relative \
+	  --go-grpc_out=$(OUT_DIR) --go-grpc_opt=paths=source_relative \
+	  $(PROTOS)
+
+clean:
+	rm -f $(OUT_DIR)/*.pb.go

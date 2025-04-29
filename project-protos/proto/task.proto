@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package task;
+
+import "google/protobuf/empty.proto";
+option go_package = "github.com/Retual004/EvgenyNoScammer/project-protos/proto/task";
+
+// Сущность задача
+message Task {
+  uint32 id      = 1;
+  string title   = 2;
+  bool   is_done = 3;
+  uint32 user_id = 4;
+}
+
+// Create
+message CreateTaskRequest {
+  string title   = 1;
+  bool   is_done = 2;
+  uint32 user_id = 3;
+}
+message CreateTaskResponse {
+  Task task = 1;
+}
+
+// List
+message ListTasksRequest {}
+message ListTasksResponse {
+  repeated Task tasks = 1;
+}
+
+// Update
+message UpdateTaskRequest {
+  Task task = 1;
+}
+
+// Delete
+message DeleteTaskRequest {
+  uint32 id = 1;
+}
+
+service TaskService {
+  rpc CreateTask    (CreateTaskRequest)   returns (CreateTaskResponse);
+  rpc GetTask       (Task)                returns (Task);
+  rpc ListTasks     (ListTasksRequest)    returns (ListTasksResponse);
+  rpc UpdateTask    (UpdateTaskRequest)   returns (Task);
+  rpc DeleteTask    (DeleteTaskRequest)   returns (google.protobuf.Empty);
+}
